@@ -10,9 +10,14 @@
 
 <div class="container">
     <div class="col-12">
+        @foreach ($user as $item)
+            <img src="{{ asset('storage/images/'. $item->image) }}" style="width: 100px" alt="">
+        @endforeach
+    </div>
+    <div class="col-12">
         <form action="{{ route('store') }}" method="post"> @csrf
             <div class="row">
-                <input type="text" name="user_id" id="user_id">
+                <input type="hidden" name="user_id" id="user_id">
                 <div class="form-group col-md-12">
                     <label for="">Nama</label>
                     <input type="text" name="name" id="" class="form-control">
@@ -60,16 +65,10 @@ $('#img_file_upid').on('change',function(ev){
         }
     });
 
-    var user_id = document.getElementById('user_id').value;
+    // var user_id = document.getElementById('user_id').value;
 
     var postData=new FormData();
     postData.append('file',this.files[0]);
-    // postData.append('user_id', user_id[0]);
-    // console.log(postData);
-
-    // for(let [name, value] of postData) {
-    //     alert(`${name} = ${value}`);
-    // }
 
     var url="{{url('ajaxuploadimg')}}";
 
@@ -82,7 +81,7 @@ $('#img_file_upid').on('change',function(ev){
         processData:false,
         success:function(response){
             console.log(response.users);
-            $('#user_id').val(response.users.id);
+            // $('#user_id').val(response.users.id);
         }
     });
 

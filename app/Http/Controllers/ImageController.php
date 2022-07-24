@@ -17,29 +17,38 @@ class ImageController extends Controller
 
     public function index()
     {
-        return view('welcome');
+        $user = User::all();
+        return view('welcome', compact('user'));
     }
 
     public function imguploadpost(Request $request){
     	if($request->ajax()){
     	    $data = $request->file('file');
-            $filename = $data->hashName();
+            $extension = $data->getClientOriginalExtension();
+            $filename = csrf_token().'.'.$extension; 
 
-            if($request->user_id != null) {
-                $user = new User();
-                $user->image = $filename;
-                $user->save();
+            $usersImage = public_path("storage/images/".$filename);
 
-                $users = User::where('id', $user->id)->first();
+            if(File::exists($usersImage)) {
+                
+                User::where('image', $filename)->update(['image' => $filename]);
+                
+                unlink($usersImage);
+
+
+                $users = User::where('image', $filename)->first();
+
+                $data->storeAs('public/images', $filename);
             } else {
-                $user = User::find($request->user_id);
-                $user->image = $filename;
-                $user->save();
+                // $user = new User();
+                // $user->image = $filename;
+                // $user->save();
+                $user = User::create(['image' => $filename]);
 
                 $users = User::where('id', $user->id)->first();
+            
+                $data->storeAs('public/images', $filename);
             }
-
-            $data->storeAs('public/images', $filename);
 
             return response()->json([
                 'success' => 'done',
